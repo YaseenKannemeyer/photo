@@ -1,0 +1,137 @@
+---
+import Base from '../layouts/Base.astro';
+import Print from '../components/Print.astro';
+import { Image, getImage } from 'astro:assets';
+import { series, hero } from '../data/series';
+import { site } from '../config';
+import BlurText from '../components/reactbits/BlurText';
+import Magnet from '../components/reactbits/Magnet';
+import FlowingMenu from '../components/reactbits/FlowingMenu';
+import { TextReveal } from '../components/magicui/text-reveal';
+
+const bySlug = Object.fromEntries(series.map((s) => [s.slug, s]));
+// The pan: six prints at different heights, like a wall seen while walking past it.
+const wall = [
+  { photo: bySlug.coast.photos[0], slug: 'coast', h: 'max-md:w-[78vw] md:h-[62vh]' },
+  { photo: bySlug.portraits.photos[1], slug: 'portraits', h: 'max-md:w-[62vw] md:h-[74vh]', lift: 'md:-mt-16' },
+  { photo: bySlug.still.photos[2], slug: 'still', h: 'max-md:w-[70vw] md:h-[48vh]', lift: 'md:mt-24' },
+  { photo: bySlug.city.photos[0], slug: 'city', h: 'max-md:w-[78vw] md:h-[66vh]' },
+  { photo: bySlug.coast.photos[1], slug: 'coast', h: 'max-md:w-[66vw] md:h-[70vh]', lift: 'md:-mt-10' },
+  { photo: bySlug.portraits.photos[0], slug: 'portraits', h: 'max-md:w-[62vw] md:h-[58vh]', lift: 'md:mt-20' },
+];
+const menuItems = await Promise.all(
+  series.map(async (s) => {
+    const img = await getImage({ src: s.cover.src, width: 640, format: 'webp', quality: 70 });
+    return { text: s.title, link: `/work/${s.slug}`, image: img.src, meta: s.year, marquee: `${s.title}. ${s.summary}` };
+  }),
+);
+---
+<Base title="Home" home>
+  <!-- Hero: a print developing in the tray. Full bleed, the name set huge along the bottom. -->
+  <section class="relative h-[100svh] min-h-[560px] overflow-hidden" data-hero>
+    <div class="absolute inset-0" data-hero-media data-develop>
+      <Image
+        src={hero.src}
+        alt={hero.alt}
+        widths={[640, 960, 1280, 1600, 2000, 2400]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        decoding="sync"
+        format="webp"
+        quality={80}
+        class="h-full w-full object-cover"
+      />
+      <div class="safelight" aria-hidden="true"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-bg via-bg/30 to-transparent" aria-hidden="true"></div>
+    </div>
+    <div class="wrap absolute inset-x-0 bottom-0 pb-8 md:pb-12" data-hero-text>
+      <h1 class="font-display text-4xl text-text">
+        <BlurText client:load as="span" text={site.name} trigger="load" animateBy="letters" effect="focus" delay={45} stepDuration={0.45} blur={14} className="justify-start" />
+      </h1>
+      <div class="mt-6 grid gap-6 md:grid-cols-12 md:items-end">
+        <p class="max-w-[38ch] text-lg text-text md:col-span-6" data-develop-fade>Portraits, places and still life, photographed in the Cape for magazines, architects and private clients.</p>
+        <div class="flex items-center gap-6 md:col-span-6 md:justify-end" data-develop-fade style="--d: 1500ms">
+          <Magnet client:visible padding={70} magnetStrength={3} maxOffset={10}><a href="/contact" class="btn">Enquire</a></Magnet>
+          <a href="/work" class="btn-quiet">View the work</a>
+        </div>
+      </div>
+      <p class="caption mt-8" data-develop-fade style="--d: 1800ms"><strong>{hero.caption}</strong>, <span class="place">{hero.place}</span></p>
+    </div>
+  </section>
+
+  <!-- Selected work: the wall, walked past. The section pins at the top and vertical scroll pans the track sideways; once the last print has passed, the page carries on to the series. -->
+  <section class="relative h-dvh overflow-hidden" data-pan aria-labelledby="selected">
+    <div class="flex h-full w-max items-center gap-[9vw] px-5 will-change-transform md:gap-[7vw] md:px-[6vw]" data-pan-track>
+      <div class="w-[72vw] shrink-0 md:w-[30vw]">
+        <h2 id="selected" class="text-2xl">Selected work</h2>
+        <p class="mt-4 max-w-[34ch] text-base text-muted">Six prints from the four series. Each opens the body of work it belongs to.</p>
+      </div>
+      {wall.map((w) => (
+        <figure class:list={['shrink-0', w.lift]}>
+          <a href={`/work/${w.slug}`} class="print-link block">
+            <div class:list={['print', w.h]} style={`aspect-ratio:${w.photo.src.width}/${w.photo.src.height}`} data-unmask>
+              <Image src={w.photo.src} alt={w.photo.alt} widths={[640, 960, 1280, 1600]} sizes="(min-width: 768px) 60vh, 80vw" format="webp" quality={78} loading="lazy" class="h-full w-full object-cover" />
+            </div>
+            <figcaption class="caption"><strong>{w.photo.caption}</strong>{w.photo.place && <span>, <span class="place">{w.photo.place}</span></span>}</figcaption>
+          </a>
+        </figure>
+      ))}
+      <div class="w-5 shrink-0 md:w-[4vw]" aria-hidden="true"></div>
+    </div>
+    <div class="absolute inset-x-5 bottom-6 h-px bg-line md:inset-x-[6vw]" aria-hidden="true">
+      <div class="h-full origin-left scale-x-0 bg-accent" data-pan-progress></div>
+    </div>
+  </section>
+
+  <!-- The four series. Rows that flow with the cover image when you touch them. -->
+  <section class="mt-28 md:mt-40" aria-labelledby="series">
+    <div class="wrap"><h2 id="series" class="text-2xl">Four series</h2></div>
+    <div class="mt-10 h-[60vh] min-h-[420px] border-y border-line">
+      <FlowingMenu
+        client:visible
+        items={menuItems}
+        align="left"
+        bgColor="transparent"
+        textColor="var(--text)"
+        marqueeBgColor="var(--surface)"
+        marqueeTextColor="var(--accent)"
+        borderColor="var(--line)"
+        imageShape="rounded"
+        speed={70}
+        direction="alternate"
+        intro={false}
+        ariaLabel="Series"
+      />
+    </div>
+  </section>
+
+  <!-- A short statement, read by scrolling. -->
+  <section class="wrap mt-16 md:mt-24" aria-label="Approach">
+    <TextReveal client:visible className="h-[160vh]" text="Most of these pictures were made before eight in the morning, in winter, when the sea and the sky share one colour. Nothing is retouched beyond what a print would need." />
+  </section>
+
+  <!-- About, in brief. -->
+  <section class="wrap grid gap-10 md:grid-cols-12" aria-labelledby="about">
+    <div class="md:col-span-5">
+      <Print photo={bySlug.portraits.photos[6]} sizes="(min-width: 768px) 38vw, 100vw" widths={[480, 768, 1024, 1440]} caption={false} parallax={30} />
+    </div>
+    <div class="md:col-span-6 md:col-start-7 md:self-center">
+      <h2 id="about" class="text-2xl">About</h2>
+      <p class="mt-6 text-lg">{site.description}</p>
+      <p class="mt-4 text-base text-muted">Most work is shot on medium format and delivered as finished files and, where it suits the job, as prints. Projects start with a short call and a scouting day.</p>
+      <a href="/about" class="btn-quiet mt-6">More about the studio</a>
+    </div>
+  </section>
+
+  <!-- The action, set large. -->
+  <section class="wrap mt-32 md:mt-48" aria-labelledby="enquire">
+    <p class="text-base text-muted">Taking commissions for 2027.</p>
+    <h2 id="enquire" class="mt-4 text-4xl">
+      <Magnet client:visible padding={120} magnetStrength={6} maxOffset={14} wrapperClassName="inline-block">
+        <a href="/contact" class="link decoration-line hover:text-accent">Enquire</a>
+      </Magnet>
+    </h2>
+    <p class="mt-8 max-w-[44ch] text-lg text-muted">Send a few lines about the project and I will reply within two working days. Or write directly to <a href={`mailto:${site.email}`} class="link text-text">{site.email}</a>.</p>
+  </section>
+</Base>

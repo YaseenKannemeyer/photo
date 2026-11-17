@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import Print from '../../components/Print.astro';
+import { series } from '../../data/series';
+const layout: Record<string, { cls: string; parallax: number }> = {
+  coast: { cls: 'md:col-span-5', parallax: 30 },
+  portraits: { cls: 'md:col-span-5 md:col-start-8 md:mt-40', parallax: 50 },
+  still: { cls: 'md:col-span-7 md:mt-12', parallax: 24 },
+  city: { cls: 'md:col-span-6 md:col-start-7 md:mt-32', parallax: 44 },
+};
+---
+<Base title="Work" description="Four series by Lena Marais: Coast, Portraits, Still and City. Editorial, portrait, still life and architecture photography from Cape Town.">
+  <section class="wrap pt-28 md:pt-40">
+    <h1 class="text-3xl">Work</h1>
+    <p class="mt-8 max-w-[48ch] text-lg text-muted">Four bodies of work, each shown in full. Commissioned and personal pictures sit side by side.</p>
+  </section>
+  <section class="wrap mt-20 grid gap-16 md:grid-cols-12 md:gap-x-8 md:gap-y-0" aria-label="Series">
+    {series.map((s) => (
+      <div class={layout[s.slug].cls}>
+        <Print
+          photo={{ ...s.cover, caption: s.title, place: undefined }}
+          href={`/work/${s.slug}`}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          widths={[480, 768, 1024, 1440]}
+          caption={false}
+          parallax={layout[s.slug].parallax}
+        />
+        <div class="mt-5 flex items-baseline justify-between gap-4">
+          <a href={`/work/${s.slug}`} class="link font-display text-2xl">{s.title}</a>
+          <span class="text-xs text-muted">{s.photos.length} photographs</span>
+        </div>
+        <p class="mt-2 max-w-[40ch] text-base text-muted">{s.summary}</p>
+      </div>
+    ))}
+  </section>
+</Base>

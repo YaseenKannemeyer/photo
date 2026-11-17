@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import Print from '../components/Print.astro';
+import { portraitOfPhotographer } from '../data/series';
+import { site } from '../config';
+const commissions = [
+  ['Editorial', 'Features and portraits for print and online magazines, on a day rate.'],
+  ['Portraits', 'Individuals, families and founders, usually on location, half a day.'],
+  ['Architecture and interiors', 'Buildings and spaces for practices, developers and publications.'],
+  ['Still life and product', 'Objects for makers and brands, in natural light.'],
+  ['Prints', 'Editioned prints from any series, on cotton rag, framed on request.'],
+];
+const process = [
+  ['Brief', 'A short call to agree on the pictures you need, the dates and the budget.'],
+  ['Scout', 'A visit to the location to find the light and plan the day. For buildings this is where the schedule gets made.'],
+  ['Shoot', 'The day itself. Most commissions are one day, on medium format, with a small crew or none.'],
+  ['Deliver', 'A first edit within a week, final files within two. Usage terms are written into the quote.'],
+];
+---
+<Base title="About" description={`About ${site.name}, photographer in Cape Town. What commissions cover, how a project runs, and how to order prints.`}>
+  <section class="wrap pt-28 md:pt-40">
+    <h1 class="text-3xl">About</h1>
+  </section>
+  <section class="wrap mt-16 grid gap-12 md:grid-cols-12 lg:gap-16">
+    <div class="md:col-span-5">
+      <Print photo={portraitOfPhotographer} sizes="(min-width: 768px) 40vw, 100vw" widths={[480, 768, 1024, 1440]} caption={false} priority aspect="4/5" parallax={30} />
+    </div>
+    <div class="md:col-span-6 md:col-start-7 md:self-center">
+      <p class="text-xl">{site.description}</p>
+      <p class="mt-6 text-base text-muted">I started in newspapers, which is where the habit of working fast and getting it right in camera comes from. Since 2018 the studio has been commission based, with time kept each winter for the coast series.</p>
+      <p class="mt-4 text-base text-muted">Pictures are made on medium format digital and, for personal work, on 120 film. Files are delivered finished. Retouching is kept to what a good print would need.</p>
+    </div>
+  </section>
+
+  <section class="wrap mt-32 md:mt-48" aria-labelledby="commissions">
+    <h2 id="commissions" class="text-2xl">What commissions cover</h2>
+    <dl class="mt-10 grid gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+      {commissions.map(([t, d]) => (
+        <div class="rule pt-5">
+          <dt class="font-display text-xl">{t}</dt>
+          <dd class="mt-3 max-w-[36ch] text-base text-muted">{d}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="wrap mt-32 md:mt-48" aria-labelledby="process">
+    <h2 id="process" class="text-2xl">How a project runs</h2>
+    <ol class="mt-10">
+      {process.map(([t, d]) => (
+        <li class="rule grid gap-3 py-8 md:grid-cols-12 md:gap-8">
+          <h3 class="text-2xl md:col-span-4">{t}</h3>
+          <p class="max-w-[48ch] text-lg text-muted md:col-span-7 md:col-start-6">{d}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="wrap mt-32 md:mt-48">
+    <a href="/contact" class="btn">Enquire</a>
+  </section>
+</Base>

@@ -1,0 +1,59 @@
+---
+import Base from '../../layouts/Base.astro';
+import Print from '../../components/Print.astro';
+import Lightbox from '../../components/Lightbox.astro';
+import { Icon } from 'astro-icon/components';
+import { series } from '../../data/series';
+
+export function getStaticPaths() {
+  return series.map((s, i) => ({
+    params: { slug: s.slug },
+    props: { s, prev: series[(i - 1 + series.length) % series.length], next: series[(i + 1) % series.length] },
+  }));
+}
+const { s, prev, next } = Astro.props;
+
+// Hang the prints: landscapes wide, portraits narrow, alternating wall side, each at its own depth.
+const place = (i: number, landscape: boolean) => {
+  const span = landscape ? 'md:col-span-7' : 'md:col-span-4';
+  const side = i % 2 === 0 ? 'md:col-start-1' : landscape ? 'md:col-start-6' : 'md:col-start-9';
+  const drop = i % 2 === 1 ? 'md:mt-32' : i === 0 ? '' : 'md:-mt-12';
+  return `${span} ${side} ${drop}`;
+};
+const depth = [24, 56, 32, 48, 20, 60, 36, 44];
+---
+<Base title={s.title} description={`${s.title}: ${s.summary} ${s.intro}`}>
+  <section class="wrap pt-28 md:pt-40">
+    <p class="text-xs text-muted"><a href="/work" class="link">Work</a></p>
+    <h1 class="mt-4 text-3xl">{s.title}</h1>
+    <div class="mt-8 grid gap-6 md:grid-cols-12">
+      <p class="max-w-[52ch] text-lg text-muted md:col-span-7">{s.intro}</p>
+      <p class="text-xs text-muted md:col-span-2 md:col-start-11">{s.year}<br />{s.photos.length} photographs</p>
+    </div>
+  </section>
+
+  <section class="wrap mt-20 grid gap-16 md:grid-cols-12 md:gap-x-8 md:gap-y-0" aria-label={`${s.title} photographs`}>
+    {s.photos.map((photo, i) => {
+      const landscape = photo.src.width >= photo.src.height;
+      return (
+        <div class={place(i, landscape)}>
+          <Print
+            photo={photo}
+            lightbox
+            index={i}
+            sizes={landscape ? '(min-width: 768px) 56vw, 100vw' : '(min-width: 768px) 32vw, 100vw'}
+            widths={[480, 768, 1024, 1440]}
+            parallax={depth[i % depth.length]}
+            priority={i === 0}
+          />
+        </div>
+      );
+    })}
+  </section>
+
+  <nav class="wrap rule mt-32 flex items-center justify-between pt-8" aria-label="Other series">
+    <a href={`/work/${prev.slug}`} class="btn-quiet font-display text-xl"><Icon name="ph:arrow-left" class="h-5 w-5" aria-hidden="true" /> {prev.title}</a>
+    <a href={`/work/${next.slug}`} class="btn-quiet font-display text-xl">{next.title} <Icon name="ph:arrow-right" class="h-5 w-5" aria-hidden="true" /></a>
+  </nav>
+  <Lightbox />
+</Base>

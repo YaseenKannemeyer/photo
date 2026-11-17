@@ -1,0 +1,239 @@
+@import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
+
+/*
+  Darkroom. One theme, locked dark: the site is a room with the lights off and prints on the wall.
+  Palette set: black + white + electric yellow (design-taste-frontend/references/accent-palettes.md).
+  The yellow is woven through the photographs rather than painted on buttons: the safelight cast the hero develops
+  under, the exposure line that sweeps up every print as it unmasks, place names in captions, the word being read
+  in the statement, the first inch of every hairline, a warm tint in the grain. Buttons only turn yellow on hover.
+*/
+:root {
+  --bg: #0b0b0c;
+  --surface: #141416;
+  --text: #ececea;
+  --muted: #8d8d93;
+  --accent: #ecff3a;
+  --accent-contrast: #0b0b0c;
+  --line: #27272b;
+  --scrim: rgb(0 0 0 / 0.82);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-line: var(--line);
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.45;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 1.2;
+  --text-2xl: clamp(2.25rem, 1.2rem + 3.2vw, 3.75rem);
+  --text-2xl--line-height: 1.02;
+  --text-3xl: clamp(3.25rem, 1.5rem + 7vw, 8.5rem);
+  --text-3xl--line-height: 0.92;
+  --text-4xl: clamp(4rem, 2rem + 11vw, 13rem);
+  --text-4xl--line-height: 0.86;
+  --radius: 0px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    min-height: 100dvh;
+    background: var(--bg);
+    overflow-x: clip;
+  }
+  ::selection { background: var(--accent); color: var(--accent-contrast); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  img { display: block; max-width: 100%; height: auto; }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    font-variation-settings: 'opsz' 96, 'wdth' 100;
+  }
+  p { text-wrap: pretty; }
+  .font-display { font-variation-settings: 'opsz' 96, 'wdth' 100; }
+}
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1600px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) { .wrap { padding-inline: 1.5rem; } }
+  @media (min-width: 1024px) { .wrap { padding-inline: 3rem; } }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+    padding: 1rem 1.6rem;
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--text);
+    color: var(--bg);
+    transition: transform 200ms var(--ease-out-expo), background-color 250ms, color 250ms;
+  }
+  .btn:hover { background: var(--accent); color: var(--accent-contrast); }
+  .btn:active { transform: scale(0.98); }
+  .btn-quiet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    padding: 1rem 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--muted);
+    transition: text-decoration-color 250ms;
+  }
+  .btn-quiet:hover { color: var(--accent); text-decoration-color: var(--accent); }
+  .link {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--line);
+    transition: text-decoration-color 250ms, color 250ms;
+  }
+  .link:hover { color: var(--accent); text-decoration-color: var(--accent); }
+
+  /* A print on the wall. */
+  .print {
+    display: block;
+    position: relative;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .print img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform-origin: center;
+    transition: opacity 400ms var(--ease-out-expo);
+  }
+  .print:hover img { opacity: 0.86; }
+  .caption {
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .caption strong { color: var(--text); font-weight: 500; }
+  .caption .place { color: var(--accent); }
+  a.print-link:hover .caption strong { color: var(--accent); }
+
+  body.lightbox-open header { opacity: 0; }
+
+  /* The exposure line: a thin yellow edge that leads each print's reveal. Driven by the engine. */
+  .expose {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 12px 1px color-mix(in srgb, var(--accent) 60%, transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Hairlines start with a short yellow tab. */
+  .rule { position: relative; }
+  .rule::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent) 0, var(--accent) 40px, var(--line) 200px);
+  }
+
+  /* Safelight: the hero develops under a yellow cast that drains away. */
+  .safelight {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    mix-blend-mode: color;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Film grain: one fixed layer, no repaints on scroll. Tinted faintly to the accent so the whole room is warm. */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.075;
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 1 0 0 0 0 0.23 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+  }
+
+  .field label { display: block; font-size: 0.8125rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--muted); }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: transparent;
+    color: var(--text);
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 0.75rem 0;
+    font-size: 1.125rem;
+    line-height: 1.4;
+    transition: border-color 250ms;
+  }
+  .field select option { background: var(--surface); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--muted); opacity: 0.8; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--text); }
+  .field .help { margin-top: 0.4rem; font-size: 0.8125rem; color: var(--muted); }
+  .field .error { margin-top: 0.4rem; font-size: 0.8125rem; color: var(--accent); display: none; }
+  .field.is-invalid .error { display: block; }
+  .field.is-invalid input, .field.is-invalid textarea { border-color: var(--accent); }
+}
+
+/* Motion. The hero develops like a print in a tray; everything else is driven by scroll in the engine script. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-develop] img { animation: develop 2600ms var(--ease-out-expo) both; }
+  [data-develop] .safelight { animation: safelight 3200ms var(--ease-out-expo) both; }
+  @keyframes safelight { 0% { opacity: 0.55; } 35% { opacity: 0.45; } 100% { opacity: 0; } }
+  [data-develop-fade] { animation: fade-up 900ms var(--ease-out-expo) both; animation-delay: var(--d, 1200ms); }
+  @keyframes develop {
+    0% { filter: brightness(0) contrast(1.6) saturate(0.4); transform: scale(1.06); }
+    100% { filter: brightness(1) contrast(1) saturate(1); transform: none; }
+  }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  /* No pinned pan: the selected-work wall becomes a plain sideways-scrolling strip. */
+  [data-pan] { height: auto; overflow-x: auto; margin-block: 6rem; }
+  [data-pan] [data-pan-track] { height: auto; padding-bottom: 1.5rem; }
+  [data-pan] [data-pan-progress] { display: none; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

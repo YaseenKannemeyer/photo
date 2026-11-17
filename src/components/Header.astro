@@ -1,0 +1,67 @@
+---
+import { site } from '../config';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const links = [
+  { href: '/work', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Enquire' },
+];
+const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href));
+---
+<!-- Fixed, blended with difference so it stays legible over any print. -->
+<header class="pointer-events-none fixed inset-x-0 top-0 z-50 mix-blend-difference text-white" transition:persist>
+  <div class="wrap flex h-16 items-center justify-between lg:h-20">
+    <a href="/" class="pointer-events-auto font-display text-lg tracking-tight" aria-label={`${site.name}, home`}>{site.name}</a>
+    <nav aria-label="Main" class="pointer-events-auto">
+      <ul class="hidden items-center gap-8 sm:flex">
+        {links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              class:list={['link text-base', { 'opacity-60 hover:opacity-100': !isActive(l.href) }]}
+              aria-current={isActive(l.href) ? 'page' : undefined}
+            >{l.label}</a>
+          </li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        class="flex h-11 items-center justify-end text-base sm:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-toggle
+      >Menu</button>
+    </nav>
+  </div>
+</header>
+<div id="mobile-menu" class="fixed inset-0 z-40 hidden flex-col justify-end bg-bg px-4 pb-16 sm:hidden" hidden>
+  <ul class="flex flex-col">
+    {links.map((l) => (
+      <li class="border-t border-line">
+        <a href={l.href} class="block py-5 font-display text-2xl" aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>
+      </li>
+    ))}
+    <li class="border-t border-line"><a href="/" class="block py-5 font-display text-2xl">Home</a></li>
+  </ul>
+</div>
+<script>
+  import { stopScroll } from '../scripts/engine';
+  function bind() {
+    const btn = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+    const menu = document.getElementById('mobile-menu');
+    if (!btn || !menu || btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    const set = (open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Close' : 'Menu';
+      menu.hidden = !open;
+      menu.classList.toggle('hidden', !open);
+      menu.classList.toggle('flex', open);
+      stopScroll(open);
+    };
+    btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
+    menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => set(false)));
+  }
+  bind();
+  document.addEventListener('astro:page-load', bind);
+</script>

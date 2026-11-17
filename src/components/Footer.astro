@@ -1,0 +1,27 @@
+---
+import { site } from '../config';
+const year = new Date().getFullYear();
+---
+<footer class="wrap rule mt-32 pt-10 pb-10 md:mt-48">
+  <div class="grid gap-10 md:grid-cols-12">
+    <div class="md:col-span-6">
+      <p class="font-display text-2xl">{site.name}</p>
+      <p class="mt-2 text-xs text-muted">{site.tagline}, {site.city}</p>
+    </div>
+    <div class="md:col-span-3">
+      <ul class="flex flex-col gap-2 text-base">
+        <li><a class="link" href={`mailto:${site.email}`}>{site.email}</a></li>
+        <li><a class="link" href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phoneDisplay}</a></li>
+        <li><a class="link" href={site.instagram} rel="noopener">Instagram</a></li>
+      </ul>
+    </div>
+    <div class="md:col-span-3">
+      <ul class="flex flex-col gap-2 text-base">
+        <li><a class="link" href="/work">Work</a></li>
+        <li><a class="link" href="/about">About</a></li>
+        <li><a class="link" href="/contact">Enquire</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="mt-14 text-xs text-muted">&copy; {year} {site.name}. All photographs are copyright of the photographer and may not be reproduced without permission.</p>
+</footer>

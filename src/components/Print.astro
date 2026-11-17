@@ -1,0 +1,71 @@
+---
+/**
+ * One photograph on the wall: responsive image, caption beside it, unmasked on scroll.
+ * `lightbox` makes it a button that opens the page's Lightbox; `href` makes it a link.
+ */
+import { Image, getImage } from 'astro:assets';
+import type { Photo } from '../data/series';
+
+interface Props {
+  photo: Photo;
+  href?: string;
+  lightbox?: boolean;
+  index?: number;
+  sizes: string;
+  widths?: number[];
+  class?: string;
+  caption?: boolean;
+  priority?: boolean;
+  parallax?: number;
+  aspect?: string;
+}
+const {
+  photo,
+  href,
+  lightbox = false,
+  index = 0,
+  sizes,
+  widths = [480, 768, 1024, 1440, 1920],
+  class: className = '',
+  caption = true,
+  priority = false,
+  parallax,
+  aspect,
+} = Astro.props;
+
+const full = lightbox ? await getImage({ src: photo.src, width: 2000, format: 'webp' }) : null;
+const label = photo.place ? `${photo.caption}, ${photo.place}` : photo.caption;
+const Tag = href ? 'a' : lightbox ? 'button' : 'div';
+---
+<figure class={className} data-parallax={parallax} >
+  <Tag
+    href={href}
+    type={lightbox ? 'button' : undefined}
+    class:list={['block w-full text-left', { 'print-link': href, 'cursor-zoom-in': lightbox }]}
+    data-lightbox-item={lightbox ? '' : undefined}
+    data-full={full?.src}
+    data-alt={photo.alt}
+    data-caption={label}
+    data-index={lightbox ? index : undefined}
+    aria-label={lightbox ? `Open ${label} full size` : undefined}
+  >
+    <div class="print" data-unmask style={aspect ? `aspect-ratio:${aspect}` : undefined}>
+      <Image
+        src={photo.src}
+        alt={photo.alt}
+        widths={widths}
+        sizes={sizes}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchpriority={priority ? 'high' : 'auto'}
+        decoding={priority ? 'sync' : 'async'}
+        format="webp"
+        quality={78}
+      />
+    </div>
+    {caption && (
+      <figcaption class="caption">
+        <strong>{photo.caption}</strong>{photo.place && <span>, <span class="place">{photo.place}</span></span>}
+      </figcaption>
+    )}
+  </Tag>
+</figure>

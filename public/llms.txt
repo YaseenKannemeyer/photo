@@ -1,0 +1,7 @@
+# Lena Marais, Photographer
+
+Portfolio site for a photographer based in Cape Town, South Africa, taking editorial, portrait, still life and architecture commissions.
+
+- /work: four series (Coast, Portraits, Still, City)
+- /about: biography, what commissions cover, how a project runs
+- /contact: enquiry form and contact details
